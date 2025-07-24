@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "servo_uart_driver.h": "c",
+        "step_motor_driver.h": "c",
+        "step_motor_app.h": "c",
+        "emm_v5.h": "c"
+    }
+}
