@@ -86,13 +86,54 @@ void step_motor_callback_y(void)
 // 步进电机任务函数(因为使用串口，实际需要放入uart_task中)
 void step_motor_task(void)
 {
-    uint16_t length_x, length_y, length_pi;
+    uint16_t length_x, length_y;
 
     // 处理X轴电机的UART接收数据(x轴的ringbuffer结构体指针)
     length_x = rt_ringbuffer_data_len(&x_ringbuffer);
     if (length_x > 0)
     {
-        rt_ringbuffer_get(&x_ringbuffer, );
+        rt_ringbuffer_get(&x_ringbuffer, x_ringbuffer_pool_parse_buffer, length_x);
+        x_ringbuffer_pool_parse_buffer[length_x] = '\0'; // 确保字符串结束
+
+        // 解析X轴数据
+        if (Emm_V5_Parse_Response(x_ringbuffer_pool_parse_buffer, length_x, &resp_x))
+        {
+            // 处理解析后的X轴数据
+            Emm_V5_Handle_Response(&resp_x);
+            // 串口打印X轴电机的地址，此处使用通用调试串口：串口1处理
+            my_printf(&huart1, "id:%d\r\n",resp_x.addr);
+        }
+        else
+        {
+            my_printf(&huart1, "X轴数据解析错误\r\n");
+        }
+
+        // 清空解析缓冲区
+        memset(x_ringbuffer_pool_parse_buffer, 0, length_x);
+    }
+
+    // 处理Y轴电机的UART接收数据(y轴的ringbuffer结构体指针)
+    length_y = rt_ringbuffer_data_len(&y_ringbuffer);
+    if (length_y > 0)
+    {
+        rt_ringbuffer_get(&y_ringbuffer, y_ringbuffer_pool_parse_buffer, length_y);
+        y_ringbuffer_pool_parse_buffer[length_y] = '\0'; // 确保字符串结束
+
+        // 解析Y轴数据
+        if (Emm_V5_Parse_Response(y_ringbuffer_pool_parse_buffer, length_y, &resp_y))
+        {
+            // 处理解析后的Y轴数据
+            Emm_V5_Handle_Response(&resp_y);
+            // 串口打印Y轴电机的地址，此处使用通用调试串口：串口1处理
+            my_printf(&huart1, "id:%d\r\n",resp_y.addr);
+        }
+        else
+        {
+            my_printf(&huart1, "Y轴数据解析错误\r\n");
+        }
+
+        // 清空解析缓冲区
+        memset(y_ringbuffer_pool_parse_buffer, 0, length_y);
     }
 }
 

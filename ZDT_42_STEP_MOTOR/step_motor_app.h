@@ -22,6 +22,7 @@ void step_motor_app_init(void);
 void step_motor_app_uart_init(void);
 void step_motor_callback_x(void);
 void step_motor_callback_y(void);
+void step_motor_task(void);
 
 #endif
 
