@@ -1,0 +1,6 @@
+# VSCode specific
+.vscode/
+
+# Compiled files
+*.o
+*.exe
